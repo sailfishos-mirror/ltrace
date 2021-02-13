@@ -87,14 +87,14 @@ set libfopen_so [ltraceCompile libfopen.so -ldl \
 }]]]
 
 setenv LD_PRELOAD $libfopen_so
-ltraceMatch1 [ltraceRun -L -S -F $conf -- $bin] {^open@SYS\("/some/path"} == 0
+ltraceMatch1 [ltraceRun -L -S -F $conf -- $bin] {^open@SYS\("/some/path", 0\)} == 0
 unsetenv LD_PRELOAD
 
 # On the other hand, if -F somedir/ is given, we want to accept
 # syscalls.conf found there.
 
 ltraceMatch [ltraceRun -L -S -F $dir -- $bin] {
-    {{^open@SYS\("/some/path"} == 1}
+    {{^open@SYS\("/some/path", 0\)} == 1}
     {{^write@SYS\(1, "something", 10\)} == 1}
     {{^mount@SYS\("source", "target", "filesystemtype"} == 1}
 }

@@ -309,12 +309,9 @@ arch_fetch_arg_init(enum tof type, struct process *proc,
 	struct fetch_script how = pass_arg(context, proc, ret_info);
 	if (how.c == CVT_ERR)
 		goto fail;
-	if (how.c == CVT_NOP && how.f == FETCH_STACK) {
+	if (how.c == CVT_BYREF && how.f == FETCH_GPR) {
 		/* XXX double cast.  */
 		context->x8 = (arch_addr_t) (uintptr_t) context->gregs.regs[8];
-		/* See the comment above about the assert.  */
-		assert(! "Unexpected: first argument passed on stack.");
-		abort();
 	}
 
 	return context;
