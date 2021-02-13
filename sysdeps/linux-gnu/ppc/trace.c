@@ -57,6 +57,7 @@ get_arch_dep(struct process *proc)
 }
 
 #define SYSCALL_INSN   0x44000002
+#define SYSCALL2_INSN  0x44000001
 
 /* Returns 1 if syscall, 2 if sysret, 0 otherwise. */
 int
@@ -75,7 +76,7 @@ syscall_p(struct process *proc, int status, int *sysnum)
 				0);
 #endif
 
-		if (insn == SYSCALL_INSN) {
+		if (insn == SYSCALL_INSN || insn == SYSCALL2_INSN) {
 			*sysnum =
 			    (int)ptrace(PTRACE_PEEKUSER, proc->pid,
 					sizeof(long) * PT_R0, 0);
