@@ -145,7 +145,7 @@ arch_type_sizeof(struct process *proc, struct arg_type_info *info)
 		return (size_t)-2;
 
 	default:
-		assert(info->type != info->type);
+		//assert(info->type != info->type);
 		abort();
 	}
 }
@@ -158,7 +158,7 @@ arch_type_alignof(struct process *proc, struct arg_type_info *info)
 
 	switch (info->type) {
 	default:
-		assert(info->type != info->type);
+		//assert(info->type != info->type);
 		abort();
 		break;
 

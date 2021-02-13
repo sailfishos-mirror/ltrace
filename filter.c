@@ -79,7 +79,7 @@ filter_lib_matcher_name_init(struct filter_lib_matcher *matcher,
 {
 	switch (type) {
 	case FLM_MAIN:
-		assert(type != type);
+		//assert(type != type);
 		abort();
 
 	case FLM_SONAME:
@@ -137,7 +137,7 @@ matcher_matches_library(struct filter_lib_matcher *matcher, struct library *lib)
 	case FLM_MAIN:
 		return lib->type == LT_LIBTYPE_MAIN;
 	}
-	assert(matcher->type != matcher->type);
+	//assert(matcher->type != matcher->type);
 	abort();
 }
 

@@ -363,7 +363,7 @@ value_set_word(struct value *value, long word)
 		u.u64 = word;
 		break;
 	default:
-		assert(sz != sz);
+		//assert(sz != sz);
 		abort();
 	}
 
@@ -414,7 +414,7 @@ value_extract_word(struct value *value, long *retp,
 		*retp = (long)u.u64;
 		return 0;
 	default:
-		assert(sz != sz);
+		//assert(sz != sz);
 		abort();
 	}
 }

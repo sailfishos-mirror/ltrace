@@ -523,7 +523,7 @@ classify(struct process *proc, struct fetch_context *context,
 
 	default:
 		/* Unsupported type.  */
-		assert(info->type != info->type);
+		//assert(info->type != info->type);
 		abort();
 	}
 	abort();
