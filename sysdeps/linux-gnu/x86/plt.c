@@ -28,18 +28,18 @@
 #include "trace.h"
 
 static GElf_Addr
-x86_plt_offset(uint32_t i)
+x86_plt_offset(struct ltelf *lte, uint32_t i)
 {
 	/* Skip the first PLT entry, which contains a stub to call the
 	 * resolver.  */
-	return (i + 1) * 16;
+	return (i + (lte->second_plt_seen ? 0 : 1)) * 16;
 }
 
 GElf_Addr
 arch_plt_sym_val(struct ltelf *lte, size_t ndx, GElf_Rela *rela)
 {
 	uint32_t i = *VECT_ELEMENT(&lte->arch.plt_map, uint32_t, ndx);
-	return x86_plt_offset(i) + lte->plt_addr;
+	return x86_plt_offset(lte, i) + lte->plt_addr;
 }
 
 void *
@@ -116,6 +116,13 @@ arch_elf_init(struct ltelf *lte, struct library *lib)
 	 *	 400426:   68 00 00 00 00          pushq  $0x0
 	 *	 40042b:   e9 e0 ff ff ff          jmpq   400410 <_init+0x18>
 	 *
+	 * For CET binaries it is the following:
+	 *
+	 *	13d0:       f3 0f 1e fa             endbr64
+	 *	13d4:       68 27 00 00 00          pushq  $0x27  <-- index
+	 *	13d9:       f2 e9 71 fd ff ff       bnd jmpq 1150 <.plt>
+	 *	13df:       90                      nop
+	 *
          * On i386, the argument to push is an offset of relocation to
 	 * use.  The first PLT slot has an offset of 0x0, the second
 	 * 0x8, etc.  On x86_64, it's directly the index that we are
@@ -128,11 +135,33 @@ arch_elf_init(struct ltelf *lte, struct library *lib)
 	unsigned int i, sz = vect_size(&lte->plt_relocs);
 	for (i = 0; i < sz; ++i) {
 
-		GElf_Addr offset = x86_plt_offset(i);
+		GElf_Addr offset = x86_plt_offset(lte, i);
+		uint32_t reloc_arg;
 
 		uint8_t byte;
-		if (elf_read_next_u8(lte->plt_data, &offset, &byte) < 0
-		    || byte != 0xff
+		if (elf_read_next_u8(lte->plt_data, &offset, &byte) < 0)
+		  continue;
+
+
+		if (byte == 0xf3
+		    && elf_read_next_u8(lte->plt_data, &offset, &byte) >= 0
+		    && byte == 0x0f
+		    && elf_read_next_u8(lte->plt_data, &offset, &byte) >= 0
+		    && byte == 0x1e
+		    && elf_read_next_u8(lte->plt_data, &offset, &byte) >= 0
+		    && byte == 0xfa
+		    && elf_read_next_u8(lte->plt_data, &offset, &byte) >= 0
+		    && byte == 0x68
+		    && elf_read_next_u32(lte->plt_data,
+					 &offset, &reloc_arg) >= 0)
+		  {
+		    /* CET */
+		    fprintf(stderr, "%d: reloc_arg is %lx\n", i, (long)reloc_arg);
+		    *VECT_ELEMENT(&lte->arch.plt_map, unsigned int, reloc_arg) = i;
+		    continue;
+		  }
+
+		if (byte != 0xff
 		    || elf_read_next_u8(lte->plt_data, &offset, &byte) < 0
 		    || (byte != 0xa3 && byte != 0x25))
 			continue;
@@ -140,7 +169,6 @@ arch_elf_init(struct ltelf *lte, struct library *lib)
 		/* Skip immediate argument in the instruction.  */
 		offset += 4;
 
-		uint32_t reloc_arg;
 		if (elf_read_next_u8(lte->plt_data, &offset, &byte) < 0
 		    || byte != 0x68
 		    || elf_read_next_u32(lte->plt_data,

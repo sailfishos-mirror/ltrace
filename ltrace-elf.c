@@ -639,7 +639,21 @@ ltelf_read_elf(struct ltelf *lte, const char *filename)
 			}
 		} else if (shdr.sh_type == SHT_PROGBITS
 			   || shdr.sh_type == SHT_NOBITS) {
-			if (strcmp(name, ".plt") == 0) {
+			if (strcmp(name, ".plt") == 0
+			    && lte->second_plt_seen == 0) {
+				lte->plt_addr = shdr.sh_addr;
+				lte->plt_size = shdr.sh_size;
+				lte->plt_data = elf_loaddata(scn, &shdr);
+				if (lte->plt_data == NULL)
+					fprintf(stderr,
+						"Can't load .plt data\n");
+				lte->plt_flags = shdr.sh_flags;
+			}
+			/* An Intel CET binary has two PLTs; the
+			   initial PLTGOT points to the second
+			   one.  */
+			else if (strcmp(name, ".plt.sec") == 0) {
+				lte->second_plt_seen = 1;
 				lte->plt_addr = shdr.sh_addr;
 				lte->plt_size = shdr.sh_size;
 				lte->plt_data = elf_loaddata(scn, &shdr);

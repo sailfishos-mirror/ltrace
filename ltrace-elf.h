@@ -45,6 +45,7 @@ struct ltelf {
 	Elf_Data *dynsym;
 	size_t dynsym_count;
 	const char *dynstr;
+	int second_plt_seen;
 	GElf_Addr plt_addr;
 	GElf_Word plt_flags;
 	size_t plt_size;
