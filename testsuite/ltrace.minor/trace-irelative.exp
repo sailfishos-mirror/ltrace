@@ -54,6 +54,8 @@ set src [ltraceSource c {
 }]
 
 foreach ext {{} .pie} {
+	# ltrace does not yet support AARCH64's ifuncs
+	setup_xfail aarch64*-*-*
 	set bin1 [ltraceCompile $ext $src]
 	do_tests $bin1 ""
 }
