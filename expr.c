@@ -188,11 +188,14 @@ expr_alloc_and_clone(struct expr_node **retpp, struct expr_node *node, int own)
 int
 expr_clone(struct expr_node *retp, const struct expr_node *node)
 {
+	struct expr_node *nlhs;
+	/* Must be a known value to distinguish EXPR_OP_CALL2
+	   from EXPR_OP_CALL1 or EXPR_OP_UP.  */
+	struct expr_node *nrhs = NULL;
+
 	*retp = *node;
 
 	switch (node->kind) {
-		struct expr_node *nlhs;
-		struct expr_node *nrhs;
 
 	case EXPR_OP_ARGNO:
 	case EXPR_OP_SELF:
@@ -235,7 +238,8 @@ expr_clone(struct expr_node *retp, const struct expr_node *node)
 	case EXPR_OP_CALL1:
 		if (expr_alloc_and_clone(&nlhs, node->lhs, node->own_lhs) < 0) {
 			if (node->kind == EXPR_OP_CALL2
-			    && node->u.call.own_rhs) {
+			    && node->u.call.own_rhs
+			    && nrhs != NULL) {
 				expr_destroy(nrhs);
 				free(nrhs);
 				return -1;
