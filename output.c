@@ -645,8 +645,9 @@ frame_callback (Dwfl_Frame *state, void *arg)
 
 	Dwfl *dwfl = dwfl_thread_dwfl(dwfl_frame_thread(state));
 	Dwfl_Module *mod = dwfl_addrmodule(dwfl, pc);
-	const char *modname = NULL;
-	const char *symname = NULL;
+	/* Use "[unknown]" if we cant lookup the information.  */
+	const char *modname = "[unknown]";
+	const char *symname = "[unknown]";
 	GElf_Off off = 0;
 	if (mod != NULL) {
 		GElf_Sym sym;
