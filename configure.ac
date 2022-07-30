@@ -45,6 +45,7 @@ case "${host_cpu}" in
     loongarch*)		HOST_CPU="loongarch" ;;
     mips*)		HOST_CPU="mips" ;;
     powerpc|powerpc64|powerpc64le)	HOST_CPU="ppc" ;;
+    riscv64)		HOST_CPU="riscv64" ;;
     sun4u|sparc64)	HOST_CPU="sparc" ;;
     s390x)		HOST_CPU="s390" ;;
     i?86|x86_64)	HOST_CPU="x86" ;;
@@ -219,6 +220,7 @@ if test x"$enable_libunwind" = xyes; then
       powerpc64|powerpc64le)	UNWIND_ARCH="ppc64" ;;
       mips*)		  UNWIND_ARCH="mips" ;;
       loongarch*)	  UNWIND_ARCH="loongarch" ;;
+      riscv*)		  UNWIND_ARCH="riscv" ;;
       *)		  UNWIND_ARCH="${host_cpu}" ;;
   esac
 
@@ -414,6 +416,7 @@ AC_CONFIG_FILES([
 	sysdeps/linux-gnu/metag/Makefile
 	sysdeps/linux-gnu/mips/Makefile
 	sysdeps/linux-gnu/ppc/Makefile
+	sysdeps/linux-gnu/riscv64/Makefile
 	sysdeps/linux-gnu/s390/Makefile
 	sysdeps/linux-gnu/sparc/Makefile
 	sysdeps/linux-gnu/x86/Makefile
