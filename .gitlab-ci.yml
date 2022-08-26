@@ -1,0 +1,33 @@
+# Configure pre-commit CI via an MR to the project.
+image: fedora:latest
+
+# Only run the pipeline for an MR.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+# We split this into 3 stages.
+stages:
+  - build
+  - test
+  - install
+
+build-job:
+  stage: build
+  script:
+    - dnf -y install git gcc automake autoconf libtool m4 elfutils-devel dejagnu
+    - ./autogen.sh
+    - ./configure
+    - make
+    - echo "Successful build."
+
+test-job:
+  stage: test
+  script:
+    - echo "Skipping test for now until we make them container aware."
+
+install-job:
+  stage: install
+  script:
+    - make install DESTDIR=/tmp/ltrace
+    - echo "Successful installation."
