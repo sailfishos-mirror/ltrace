@@ -17,6 +17,14 @@
 # 02110-1301 USA
 
 # Test for a number of ways that HFA can be passed.
+# (Will Schmidt - Aug 2022).  This test may trigger a warning on powerpc,
+#    "note: the ABI of passing homogeneous float aggregates
+#					 has changed in GCC 5"
+# a "-Wno-psabi" option is passed into the compile procedures in
+# lib/ltrace.exp to disable that warning.
+# It *should* be possible to specify a pragma to disable this
+# only for this test, but I was unable to get this to work.
+#    #pragma GCC diagnostic ignored "-Wno-psabi"
 
 ltraceMatch [ltraceLibTest {
     struct(double) func_dbl_eqv(struct(double), struct(struct(double)), struct(struct(struct(double))), struct(struct(struct(struct(double)))));

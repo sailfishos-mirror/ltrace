@@ -437,6 +437,9 @@ proc LtraceCompileObjects {sources options retName} {
 	set dest $source.o
 	lappend LTRACE_TEMP_FILES $dest
 	verbose "LtraceCompileObjects: $source -> $dest"
+	if { ([istarget "powerpc*-*-linux*"]) } {
+	    lappend options "additional_flags=-Wno-psabi"
+	}
 	if {[ltrace_compile $source $dest object $options] != ""} {
 	    return false
 	}
