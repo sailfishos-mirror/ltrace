@@ -996,6 +996,8 @@ populate_this_symtab(struct process *proc, const char *filename,
 			(uintptr_t)(sym.st_value + lte->bias);
 		arch_addr_t naddr;
 
+		addr += PPC64_LOCAL_ENTRY_OFFSET(sym.st_other);
+
 		/* On arches that support OPD, the value of typical
 		 * function symbol will be a pointer to .opd, but some
 		 * will point directly to .text.  We don't want to
