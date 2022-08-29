@@ -416,7 +416,7 @@ allocate_hfa(struct fetch_context *ctx, struct process *proc,
 
 	/* if no remaining FP, GPR corresponding to slot is used
 	 * Mostly it is in part of r10.  */
-	if (ctx->vgreg == 10) {
+	if (ctx->vgreg <= 10) {
 		while (ctx->vgreg <= 10) {
 			struct value tmp;
 			value_init(&tmp, proc, NULL, hfa_info, 0);
