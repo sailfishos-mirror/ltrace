@@ -946,7 +946,7 @@ cb_keep_stepping_p(struct process_stopping_handler *self)
 	/* In UNRESOLVED state, the RESOLVED_VALUE in fact contains
 	 * the PLT entry value.  */
 	if (value == libsym->arch.resolved_value)
-		return CBS_CONT;
+		return CBS_STOP;
 
 	debug(DEBUG_PROCESS, "pid=%d PLT got resolved to value %#"PRIx64,
 	      proc->pid, value);
