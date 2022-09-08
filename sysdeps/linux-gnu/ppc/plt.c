@@ -687,8 +687,8 @@ arch_elf_add_func_entry(struct process *proc, struct ltelf *lte,
 		if (libsym == NULL
 		    || library_symbol_init(libsym, addr, full_name, 1,
 					   LS_TOPLT_NONE) < 0) {
-			free(libsym);
 			delete_symbol_chain(libsym);
+			free(libsym);
 			libsym = NULL;
 			fprintf(stderr, "Couldn't add symbol %s"
 				"for tracing.\n", name);
