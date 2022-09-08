@@ -10,7 +10,6 @@ workflow:
 stages:
   - build
   - test
-  - install
 
 build-job:
   stage: build
@@ -19,15 +18,10 @@ build-job:
     - ./autogen.sh
     - ./configure
     - make
+    - make install DESTDIR=/tmp/ltrace
     - echo "Successful build."
 
 test-job:
   stage: test
   script:
     - echo "Skipping test for now until we make them container aware."
-
-install-job:
-  stage: install
-  script:
-    - make install DESTDIR=/tmp/ltrace
-    - echo "Successful installation."
