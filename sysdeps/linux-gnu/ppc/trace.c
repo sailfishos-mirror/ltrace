@@ -120,7 +120,10 @@ arch_sw_singlestep(struct process *proc, struct breakpoint *sbp,
 	}
 
 	if ((u.insn & LWARX_MASK) != LWARX_INSTRUCTION
-	    && (u.insn & LWARX_MASK) != LDARX_INSTRUCTION)
+	    && (u.insn & LWARX_MASK) != LDARX_INSTRUCTION
+	    && (u.insn & LWARX_MASK) != LBARX_INSTRUCTION
+	    && (u.insn & LWARX_MASK) != LHARX_INSTRUCTION
+	    && (u.insn & LWARX_MASK) != LQARX_INSTRUCTION)
 		return SWS_HW;
 
 	debug(1, "singlestep over atomic block at %p", ip);
@@ -156,7 +159,10 @@ arch_sw_singlestep(struct process *proc, struct breakpoint *sbp,
 		/* Assume that the atomic sequence ends with a
 		 * stwcx/stdcx instruction.  */
 		if ((insn & STWCX_MASK) == STWCX_INSTRUCTION
-		    || (insn & STWCX_MASK) == STDCX_INSTRUCTION) {
+		    || (insn & STWCX_MASK) == STDCX_INSTRUCTION
+		    || (insn & STWCX_MASK) == STBCX_INSTRUCTION
+		    || (insn & STWCX_MASK) == STHCX_INSTRUCTION
+		    || (insn & STWCX_MASK) == STQCX_INSTRUCTION) {
 			debug(1, "pid=%d, found end of atomic block %p at %p",
 			      proc->pid, ip, addr);
 			break;
