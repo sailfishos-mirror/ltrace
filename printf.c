@@ -37,7 +37,7 @@
 struct param_enum {
 	struct value array;
 	int percent;
-	size_t *future_length;
+	unsigned long long *future_length;
 	char *format;
 	char const *ptr;
 	char const *end;
@@ -70,6 +70,8 @@ param_printf_init(struct value *cb_args, size_t nargs,
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 		break;
 	default:
 		return NULL;
@@ -124,15 +126,15 @@ form_next_param(struct param_enum *self,
 		struct arg_type_info *infop)
 {
 	/* XXX note: Some types are wrong because we lack
-	   ARGTYPE_LONGLONG, ARGTYPE_UCHAR and ARGTYPE_SCHAR.  */
+	   ARGTYPE_UCHAR and ARGTYPE_SCHAR.  */
 	assert(lng <= 2);
 	assert(hlf <= 2);
 	static enum arg_type ints[] =
 		{ ARGTYPE_CHAR, ARGTYPE_SHORT, ARGTYPE_INT,
-		  ARGTYPE_LONG, ARGTYPE_ULONG };
+		  ARGTYPE_LONG, ARGTYPE_LLONG };
 	static enum arg_type uints[] =
 		{ ARGTYPE_CHAR, ARGTYPE_USHORT, ARGTYPE_UINT,
-		  ARGTYPE_ULONG, ARGTYPE_ULONG };
+		  ARGTYPE_ULONG, ARGTYPE_ULLONG };
 
 	struct arg_type_info *elt_info = NULL;
 	if (format_type == ARGTYPE_ARRAY || format_type == ARGTYPE_POINTER)
@@ -381,7 +383,7 @@ static enum param_status
 param_printf_stop(struct param_enum *self, struct value *value)
 {
 	if (self->future_length != NULL
-	    && value_extract_word(value, (long *)self->future_length, NULL) < 0)
+	    && value_extract_word(value, (long long *)self->future_length, NULL) < 0)
 		drop_future_length(self);
 
 	return PPCB_CONT;

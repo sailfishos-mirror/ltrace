@@ -134,6 +134,10 @@ arch_type_sizeof(struct process *proc, struct arg_type_info *info)
 	case ARGTYPE_POINTER:
 		return proc->e_machine == EM_X86_64 ? 8 : 4;
 
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
+		return 8;
+
 	case ARGTYPE_FLOAT:
 		return 4;
 	case ARGTYPE_DOUBLE:
@@ -175,6 +179,8 @@ arch_type_alignof(struct process *proc, struct arg_type_info *info)
 
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_POINTER:
 		return proc->e_machine == EM_X86_64 ? 8 : 4;
 

@@ -139,7 +139,7 @@ int expr_eval(struct expr_node *node, struct value *context,
 
 /* Evaluate compile-time expression.  Returns 0 on success or negative
  * value on failure.  Computed value is passed back in *VALUEP.  */
-int expr_eval_constant(struct expr_node *node, long *valuep);
+int expr_eval_constant(struct expr_node *node, long long *valuep);
 
 /* Evaluate expression, whose result should fit into a word.  In order
  * to easily support all the structure and array accesses, we simply
@@ -147,7 +147,7 @@ int expr_eval_constant(struct expr_node *node, long *valuep);
  * to be able to get out a word-size datum to use it as an index, a
  * length, etc.  */
 int expr_eval_word(struct expr_node *node, struct value *context,
-		   struct value_dict *arguments, long *ret_value);
+		   struct value_dict *arguments, long long *ret_value);
 
 /* Returns non-zero value if the expression is a compile-time
  * constant.  Currently this is only EXPR_OP_CONST, but eventually

@@ -259,6 +259,8 @@ arch_fetch_arg_next(struct fetch_context *ctx, enum tof type,
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_CHAR:
 	case ARGTYPE_SHORT:
 	case ARGTYPE_USHORT:

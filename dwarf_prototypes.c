@@ -69,7 +69,8 @@ static bool _dump_ltrace_tree(const struct arg_type_info *info, int indent)
 	case ARGTYPE_INT:
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
-	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_CHAR:
 	case ARGTYPE_SHORT:
 	case ARGTYPE_USHORT:
@@ -192,6 +193,11 @@ static bool get_integer_base_type(enum arg_type *type, int byte_size,
 
 	if (byte_size == sizeof(long)) {
 		*type = is_signed ? ARGTYPE_LONG : ARGTYPE_ULONG;
+		return true;
+	}
+
+	if (byte_size == sizeof(long long)) {
+		*type = is_signed ? ARGTYPE_LLONG : ARGTYPE_ULLONG;
 		return true;
 	}
 

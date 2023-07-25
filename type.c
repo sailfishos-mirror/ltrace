@@ -43,6 +43,8 @@ type_get_simple(enum arg_type type)
 	HANDLE(ARGTYPE_UINT)
 	HANDLE(ARGTYPE_LONG)
 	HANDLE(ARGTYPE_ULONG)
+	HANDLE(ARGTYPE_LLONG)
+	HANDLE(ARGTYPE_ULLONG)
 	HANDLE(ARGTYPE_CHAR)
 	HANDLE(ARGTYPE_SHORT)
 	HANDLE(ARGTYPE_USHORT)
@@ -249,6 +251,8 @@ type_destroy(struct arg_type_info *info)
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_CHAR:
 	case ARGTYPE_SHORT:
 	case ARGTYPE_USHORT:
@@ -337,6 +341,8 @@ type_clone(struct arg_type_info *retp, const struct arg_type_info *info)
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_CHAR:
 	case ARGTYPE_SHORT:
 	case ARGTYPE_USHORT:
@@ -411,6 +417,10 @@ type_sizeof(struct process *proc, struct arg_type_info *type)
 	case ARGTYPE_ULONG:
 		return sizeof(long);
 
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
+		return sizeof(long long);
+
 	case ARGTYPE_FLOAT:
 		return sizeof(float);
 
@@ -427,7 +437,7 @@ type_sizeof(struct process *proc, struct arg_type_info *type)
 
 	case ARGTYPE_ARRAY:
 		if (expr_is_compile_constant(type->u.array_info.length)) {
-			long l;
+			long long l;
 			if (expr_eval_constant(type->u.array_info.length,
 					       &l) < 0)
 				return -1;
@@ -468,6 +478,7 @@ type_alignof(struct process *proc, struct arg_type_info *type)
 	struct { char c; short s; } cs;
 	struct { char c; int i; } ci;
 	struct { char c; long l; } cl;
+	struct { char c; long long ll; } cll;
 	struct { char c; void* p; } cp;
 	struct { char c; float f; } cf;
 	struct { char c; double d; } cd;
@@ -476,12 +487,16 @@ type_alignof(struct process *proc, struct arg_type_info *type)
 	static size_t short_alignment = alignof(s, cs);
 	static size_t int_alignment = alignof(i, ci);
 	static size_t long_alignment = alignof(l, cl);
+	static size_t llong_alignment = alignof(ll, cll);
 	static size_t ptr_alignment = alignof(p, cp);
 	static size_t float_alignment = alignof(f, cf);
 	static size_t double_alignment = alignof(d, cd);
 
 	switch (type->type) {
 		size_t alignment;
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
+		return llong_alignment;
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
 		return long_alignment;
@@ -566,7 +581,7 @@ type_aggregate_size(struct arg_type_info *info)
 	       || info->type == ARGTYPE_ARRAY);
 
 	switch (info->type) {
-		long ret;
+		long long ret;
 	case ARGTYPE_ARRAY:
 		if (expr_eval_constant(info->u.array_info.length, &ret) < 0)
 			return (size_t)-1;
@@ -588,6 +603,8 @@ type_is_integral(enum arg_type type)
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_CHAR:
 	case ARGTYPE_SHORT:
 	case ARGTYPE_USHORT:
@@ -616,11 +633,13 @@ type_is_signed(enum arg_type type)
 	case ARGTYPE_SHORT:
 	case ARGTYPE_INT:
 	case ARGTYPE_LONG:
+	case ARGTYPE_LLONG:
 		return 1;
 
+	case ARGTYPE_USHORT:
 	case ARGTYPE_UINT:
 	case ARGTYPE_ULONG:
-	case ARGTYPE_USHORT:
+	case ARGTYPE_ULLONG:
 		return 0;
 
 	case ARGTYPE_VOID:
@@ -650,8 +669,10 @@ type_get_fp_equivalent(struct arg_type_info *info)
 	case ARGTYPE_SHORT:
 	case ARGTYPE_INT:
 	case ARGTYPE_LONG:
+	case ARGTYPE_LLONG:
 	case ARGTYPE_UINT:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_USHORT:
 	case ARGTYPE_VOID:
 	case ARGTYPE_ARRAY:

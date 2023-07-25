@@ -281,7 +281,13 @@ allocate_integer(struct fetch_context *context, struct value *valuep,
 			HANDLE(0, rax);
 			HANDLE(1, rdx);
 #else
-			HANDLE(0, eax);
+		case 0:  // u64 return in EAX:EDX
+			copy_int_register(context, valuep,
+					  context->iregs.eax, offset);
+			if(sz == 8)
+				copy_int_register(context, valuep,
+						  context->iregs.edx, offset + 4);
+			return CLASS_INTEGER;
 #endif
 		default:
 			assert(!"Too many return value classes.");
@@ -470,9 +476,10 @@ classify(struct process *proc, struct fetch_context *context,
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 
 	case ARGTYPE_POINTER:
-		/* and LONGLONG */
 		/* CLASS_INTEGER */
 		classes[0] = CLASS_INTEGER;
 		return 1;
@@ -492,7 +499,7 @@ classify(struct process *proc, struct fetch_context *context,
 		 * passed by value.  */
 		assert(expr_is_compile_constant(info->u.array_info.length));
 
-		long l;
+		long long l;
 		if (expr_eval_constant(info->u.array_info.length, &l) < 0)
 			return -1;
 
@@ -640,6 +647,8 @@ arch_fetch_retval_32(struct fetch_context *context, enum tof type,
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_CHAR:
 	case ARGTYPE_SHORT:
 	case ARGTYPE_USHORT:

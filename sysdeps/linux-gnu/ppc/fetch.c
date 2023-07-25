@@ -496,6 +496,8 @@ allocate_argument(struct fetch_context *ctx, struct process *proc,
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_POINTER:
 		break;
 

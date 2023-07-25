@@ -100,8 +100,10 @@ type_get_int_equivalent(struct arg_type_info *info)
     case ARGTYPE_SHORT:
     case ARGTYPE_INT:
     case ARGTYPE_LONG:
+    case ARGTYPE_LLONG:
     case ARGTYPE_UINT:
     case ARGTYPE_ULONG:
+    case ARGTYPE_ULLONG:
     case ARGTYPE_USHORT:
         return info;
     default:
@@ -152,6 +154,8 @@ get_fetch_class(struct fetch_context *ctx, struct process *proc,
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+    case ARGTYPE_LLONG:
+    case ARGTYPE_ULLONG:
 	case ARGTYPE_CHAR:
 	case ARGTYPE_SHORT:
 	case ARGTYPE_USHORT:

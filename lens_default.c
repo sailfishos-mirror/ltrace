@@ -62,7 +62,7 @@ READER(read_double, double)
 
 #define HANDLE_WIDTH(BITS)						\
 	do {								\
-		long l;							\
+		long long l;							\
 		if (value_extract_word(value, &l, arguments) < 0)	\
 			return -1;					\
 		int##BITS##_t i = l;					\
@@ -173,7 +173,7 @@ print_char(FILE *stream, int c)
 static int
 format_char(FILE *stream, struct value *value, struct value_dict *arguments)
 {
-	long lc;
+	long long lc;
 	if (value_extract_word(value, &lc, arguments) < 0)
 		return -1;
 	return print_char(stream, (int) lc);
@@ -354,8 +354,8 @@ format_array(FILE *stream, struct value *value, struct value_dict *arguments,
 {
 	/* We need "long" to be long enough to cover the whole address
 	 * space.  */
-	(void)sizeof(char[1 - 2*(sizeof(long) < sizeof(void *))]);
-	long l;
+	(void)sizeof(char[1 - 2*(sizeof(long long) < sizeof(void *))]);
+	long long l;
 	if (expr_eval_word(length, value, arguments, &l) < 0)
 		return -1;
 	size_t len = (size_t)l;
@@ -404,11 +404,13 @@ toplevel_format_lens(struct lens *lens, FILE *stream,
 	case ARGTYPE_SHORT:
 	case ARGTYPE_INT:
 	case ARGTYPE_LONG:
+	case ARGTYPE_LLONG:
 		return format_integer(stream, value, int_fmt, arguments);
 
 	case ARGTYPE_USHORT:
 	case ARGTYPE_UINT:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_ULLONG:
 		if (int_fmt == INT_FMT_i || int_fmt == INT_FMT_default)
 			int_fmt = INT_FMT_u;
 		return format_integer(stream, value, int_fmt, arguments);
@@ -533,9 +535,11 @@ bool_lens_format_cb(struct lens *lens, FILE *stream,
 	case ARGTYPE_SHORT:
 	case ARGTYPE_INT:
 	case ARGTYPE_LONG:
+	case ARGTYPE_LLONG:
 	case ARGTYPE_USHORT:
 	case ARGTYPE_UINT:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_CHAR:
 		if ((zero = value_is_zero(value, arguments)) < 0)
 			return -1;
@@ -577,7 +581,7 @@ redispatch_as_array(struct lens *lens, FILE *stream,
 static int
 format_wchar(FILE *stream, struct value *value, struct value_dict *arguments)
 {
-	long l;
+	long long l;
 	if (value_extract_word(value, &l, arguments) < 0)
 		return -1;
 	wchar_t wc = (wchar_t) l;
@@ -615,7 +619,9 @@ string_lens_format_cb(struct lens *lens, FILE *stream,
 		case ARGTYPE_INT:
 		case ARGTYPE_UINT:
 		case ARGTYPE_LONG:
+		case ARGTYPE_LLONG:
 		case ARGTYPE_ULONG:
+		case ARGTYPE_ULLONG:
 			return redispatch_as_array(lens, stream, value,
 						   arguments,
 						   &string_lens_format_cb);
@@ -633,9 +639,11 @@ string_lens_format_cb(struct lens *lens, FILE *stream,
 	case ARGTYPE_SHORT:
 	case ARGTYPE_INT:
 	case ARGTYPE_LONG:
+	case ARGTYPE_LLONG:
 	case ARGTYPE_USHORT:
 	case ARGTYPE_UINT:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_ULLONG:
 		if (value->parent != NULL && value->type->lens == NULL)
 			return format_wchar(stream, value, arguments);
 		else

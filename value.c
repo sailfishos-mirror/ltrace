@@ -234,8 +234,8 @@ value_size(struct value *val, struct value_dict *arguments)
 		      arguments, &length) < 0)
 		return (size_t)-1;
 
-	size_t l;
-	int o = value_extract_word(&length, (long *)&l, arguments);
+	uint64_t l;
+	int o = value_extract_word(&length, (long long *)&l, arguments);
 	value_destroy(&length);
 
 	if (o < 0)
@@ -293,7 +293,7 @@ value_init_deref(struct value *ret_val, struct value *valp)
 
 	/* Note: extracting a pointer value should not need value_dict
 	 * with function arguments.  */
-	long l;
+	long long l;
 	if (value_extract_word(valp, &l, NULL) < 0)
 		return -1;
 
@@ -336,7 +336,7 @@ union word_data {
 } u;
 
 void
-value_set_word(struct value *value, long word)
+value_set_word(struct value *value, long long word)
 {
 	size_t sz = type_sizeof(value->inferior, value->type);
 	assert(sz != (size_t)-1);
@@ -383,7 +383,7 @@ value_extract_buf_sz(struct value *value, unsigned char *tgt, size_t sz,
 }
 
 int
-value_extract_word(struct value *value, long *retp,
+value_extract_word(struct value *value, long long *retp,
 		   struct value_dict *arguments)
 {
 	size_t sz = type_sizeof(value->inferior, value->type);
@@ -402,16 +402,16 @@ value_extract_word(struct value *value, long *retp,
 
 	switch (sz) {
 	case 1:
-		*retp = (long)u.u8;
+		*retp = (long long)u.u8;
 		return 0;
 	case 2:
-		*retp = (long)u.u16;
+		*retp = (long long)u.u16;
 		return 0;
 	case 4:
-		*retp = (long)u.u32;
+		*retp = (long long)u.u32;
 		return 0;
 	case 8:
-		*retp = (long)u.u64;
+		*retp = (long long)u.u64;
 		return 0;
 	default:
 		//assert(sz != sz);

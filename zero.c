@@ -57,7 +57,7 @@ static int
 zero_callback(struct value *ret_value, struct value *lhs,
 	      struct value *rhs, struct value_dict *arguments, void *data)
 {
-	long l;
+	long long l;
 	if (value_extract_word(rhs, &l, arguments) < 0)
 		return -1;
 	if (l < 0)

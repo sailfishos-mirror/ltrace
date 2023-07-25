@@ -101,6 +101,8 @@ parse_arg_type(char **name, enum arg_type *ret)
 	KEYWORD("uint", ARGTYPE_UINT);
 	KEYWORD("long", ARGTYPE_LONG);
 	KEYWORD("ulong", ARGTYPE_ULONG);
+	KEYWORD("llong", ARGTYPE_LLONG);
+	KEYWORD("ullong", ARGTYPE_ULLONG);
 	KEYWORD("char", ARGTYPE_CHAR);
 	KEYWORD("short", ARGTYPE_SHORT);
 	KEYWORD("ushort", ARGTYPE_USHORT);
@@ -891,6 +893,8 @@ parse_nonpointer_type(struct protolib *plib, struct locus *loc,
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_CHAR:
 	case ARGTYPE_SHORT:
 	case ARGTYPE_USHORT:

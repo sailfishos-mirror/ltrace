@@ -328,7 +328,7 @@ eval_index(struct expr_node *node, struct value *context,
 	if (expr_eval(node->lhs, context, arguments, &lhs) < 0)
 		return -1;
 
-	long l;
+	long long l;
 	if (expr_eval_word(node->u.node.n, context, arguments, &l) < 0) {
 	fail:
 		value_destroy(&lhs);
@@ -387,7 +387,7 @@ expr_eval(struct expr_node *node, struct value *context,
 
 int
 expr_eval_word(struct expr_node *node, struct value *context,
-	       struct value_dict *arguments, long *ret_value)
+	       struct value_dict *arguments, long long *ret_value)
 {
 	struct value val;
 	if (expr_eval(node, context, arguments, &val) < 0)
@@ -400,7 +400,7 @@ expr_eval_word(struct expr_node *node, struct value *context,
 }
 
 int
-expr_eval_constant(struct expr_node *node, long *valuep)
+expr_eval_constant(struct expr_node *node, long long *valuep)
 {
 	assert(expr_is_compile_constant(node));
 	return expr_eval_word(node, NULL, NULL, valuep);

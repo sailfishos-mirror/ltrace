@@ -52,7 +52,7 @@ struct value {
 	union {
 		void *address;  /* VAL_LOC_COPY, VAL_LOC_SHARED */
 		arch_addr_t inf_address;  /* VAL_LOC_INFERIOR */
-		long value;     /* VAL_LOC_WORD */
+		long long value;     /* VAL_LOC_WORD */
 		unsigned char buf[0];
 	} u;
 	enum value_location_t where;
@@ -98,7 +98,7 @@ void value_destroy(struct value *val);
 
 /* Set the data held by VALP to VALUE.  This also sets the value's
  * where to VAL_LOC_WORD.  */
-void value_set_word(struct value *valp, long value);
+void value_set_word(struct value *valp, long long value);
 
 /* Set the data held by VALP to a buffer of size SIZE.  This buffer
  * may be allocated by malloc.  Returns NULL on failure.  */
@@ -137,7 +137,7 @@ size_t value_size(struct value *val, struct value_dict *arguments);
 
 /* Extract at most word-sized datum from the value.  Return 0 on
  * success or negative value on failure.  */
-int value_extract_word(struct value *val, long *retp,
+int value_extract_word(struct value *val, long long *retp,
 		       struct value_dict *arguments);
 
 /* Copy contents of VAL to DATA.  The buffer must be large enough to

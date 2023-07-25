@@ -310,6 +310,8 @@ arch_fetch_retval(struct fetch_context *ctx, enum tof type,
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_POINTER:
 	pass_in_registers:
 		if ((data = value_reserve(valuep, sz)) == NULL)

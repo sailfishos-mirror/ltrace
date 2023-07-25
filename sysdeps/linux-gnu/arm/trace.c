@@ -691,6 +691,10 @@ arch_type_sizeof(struct process *proc, struct arg_type_info *info)
 	case ARGTYPE_POINTER:
 		return 4;
 
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
+		return 8;
+
 	case ARGTYPE_FLOAT:
 		return 4;
 	case ARGTYPE_DOUBLE:

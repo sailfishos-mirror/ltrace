@@ -81,7 +81,7 @@ static void
 get_array_member(struct arg_type_info *info,
 		 struct small_struct_data_t *small_struct)
 {
-	long len;
+	long long len;
 	struct arg_type_info *array_type = info->u.array_info.elt_type;
 	expr_eval_constant(info->u.array_info.length, &len);
 	switch (array_type->type) {
@@ -424,6 +424,8 @@ classify_argument(struct fetch_context const *context,
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_CHAR:
 	case ARGTYPE_SHORT:
 	case ARGTYPE_USHORT:
@@ -563,6 +565,8 @@ classify_return_value(struct fetch_context const *context,
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_CHAR:
 	case ARGTYPE_SHORT:
 	case ARGTYPE_USHORT:

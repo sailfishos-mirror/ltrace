@@ -403,6 +403,8 @@ arch_fetch_arg_next(struct fetch_context *ctx, enum tof type,
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_POINTER:
 		return allocate_arg(ctx, proc, info, valuep);
 
@@ -437,6 +439,8 @@ arch_fetch_retval(struct fetch_context *ctx, enum tof type,
 	case ARGTYPE_UINT:
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_POINTER:
 	case ARGTYPE_STRUCT:
 		return allocate_ret(ctx, proc, info, valuep);

@@ -216,6 +216,8 @@ arch_type_sizeof(struct process *proc, struct arg_type_info *info)
 
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_POINTER:
 		return 8;
 
@@ -256,6 +258,8 @@ arch_type_alignof(struct process *proc, struct arg_type_info *info)
 
 	case ARGTYPE_LONG:
 	case ARGTYPE_ULONG:
+	case ARGTYPE_LLONG:
+	case ARGTYPE_ULLONG:
 	case ARGTYPE_POINTER:
 		return 8;
 
