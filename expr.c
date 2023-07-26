@@ -260,6 +260,12 @@ expr_is_compile_constant(struct expr_node *node)
 	return node->kind == EXPR_OP_CONST;
 }
 
+int
+expr_is_trivial(struct expr_node *node)
+{
+	return !(node->kind == EXPR_OP_CALL1 || node->kind == EXPR_OP_CALL2);
+}
+
 static int
 eval_up(struct expr_node *node, struct value *context,
 	struct value_dict *arguments, struct value *ret_value)

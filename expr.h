@@ -154,6 +154,9 @@ int expr_eval_word(struct expr_node *node, struct value *context,
  * things like sizeof or simple expressions might be allowed.  */
 int expr_is_compile_constant(struct expr_node *node);
 
+/* Nonzero if evalutaion won't cause side effects (i.e. not EXPR_OP_CALL*). */
+int expr_is_trivial(struct expr_node *node);
+
 /* Returns a pre-computed expression "self".  */
 struct expr_node *expr_self(void);
 

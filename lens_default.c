@@ -352,13 +352,21 @@ format_array(FILE *stream, struct value *value, struct value_dict *arguments,
 	     struct expr_node *length, size_t maxlen, int before,
 	     const char *open, const char *close, const char *delim)
 {
-	/* We need "long" to be long enough to cover the whole address
+	/* We need "long long" to be long enough to cover the whole address
 	 * space.  */
 	(void)sizeof(char[1 - 2*(sizeof(long long) < sizeof(void *))]);
+
+	int preloaded __attribute__((__cleanup__(value_preload_for_array_flush))) = -1;
+	if(!expr_is_trivial(length))  // zero()
+		preloaded = value_preload_for_array(value, maxlen + 1);
+
 	long long l;
 	if (expr_eval_word(length, value, arguments, &l) < 0)
 		return -1;
 	size_t len = (size_t)l;
+
+	if(preloaded == -1)
+		preloaded = value_preload_for_array(value, len > maxlen ? maxlen : len);
 
 	int written = 0;
 	if (acc_fprintf(&written, stream, "%s", open) < 0)

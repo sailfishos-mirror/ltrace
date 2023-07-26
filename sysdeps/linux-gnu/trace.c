@@ -21,6 +21,7 @@
  * 02110-1301 USA
  */
 
+#define _GNU_SOURCE
 #include "config.h"
 
 #include <asm/unistd.h>
@@ -34,6 +35,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/uio.h>
 #include <unistd.h>
 
 #ifdef HAVE_LIBSELINUX
@@ -1204,8 +1206,21 @@ umovebytes(struct process *proc, arch_addr_t addr, void *buf, size_t len)
 	int started = 0;
 	size_t offset = 0, bytes_read = 0;
 
+
+	if(len > sizeof(long)) {
+		struct iovec local = {.iov_base = buf, .iov_len = len};
+		struct iovec remote = {.iov_base = addr, .iov_len = len};
+		ssize_t rd = process_vm_readv(proc->pid, &local, 1, &remote, 1, 0);
+		if(rd != -1) {
+			started = 1;
+			offset = bytes_read = rd;
+		}
+	}
+
 	while (offset < len) {
-		a.a = ptrace(PTRACE_PEEKTEXT, proc->pid, addr + offset, 0);
+		int misalignment = (uintptr_t)(addr + offset) % sizeof(long);
+
+		a.a = ptrace(PTRACE_PEEKTEXT, proc->pid, addr + offset - misalignment, 0);
 		if (a.a == -1 && errno) {
 			if (started && errno == EIO)
 				return bytes_read;
@@ -1214,15 +1229,15 @@ umovebytes(struct process *proc, arch_addr_t addr, void *buf, size_t len)
 		}
 		started = 1;
 
-		if (len - offset >= sizeof(long)) {
-			memcpy(buf + offset, &a.c[0], sizeof(long));
-			bytes_read += sizeof(long);
+		if (len - offset >= sizeof(long) - misalignment) {
+			memcpy(buf + offset, &a.c[0] + misalignment, sizeof(long) - misalignment);
+			bytes_read += sizeof(long) - misalignment;
 		}
 		else {
-			memcpy(buf + offset, &a.c[0], len - offset);
-			bytes_read += (len - offset);
+			memcpy(buf + offset, &a.c[0] + misalignment, len - offset);
+			bytes_read += len - offset;
 		}
-		offset += sizeof(long);
+		offset += sizeof(long) - misalignment;
 	}
 
 	return bytes_read;

@@ -113,6 +113,14 @@ int value_init_element(struct value *ret_val, struct value *valp, size_t element
  * RET_VAL.  Returns 0 on success, or negative value on failure.  */
 int value_init_deref(struct value *ret_val, struct value *valp);
 
+/* Pre-read the contents of an array of max length len from the tracee.
+ * Optional optimisation. */
+int value_preload_for_array(struct value *val, size_t len);
+
+/* Must point to return value from value_preload_for_array() or -1.
+ * Suitable for use as __attribute__((__cleanup__(value_preload_for_array_flush))). */
+void value_preload_for_array_flush(int *preloaded);
+
 /* If value is in inferior, copy it over to ltrace.  Return 0 for
  * success or negative value for failure.  */
 int value_reify(struct value *val, struct value_dict *arguments);

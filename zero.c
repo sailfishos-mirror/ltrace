@@ -31,6 +31,13 @@ zero_callback_max(struct value *ret_value, struct value *lhs,
 		  struct value_dict *arguments,
 		  size_t max, void *data)
 {
+	static size_t maxlen;
+	if(!maxlen) {
+		maxlen = options.strlen > options.arraylen ? options.strlen : options.arraylen;
+		if(maxlen != (size_t)-1)
+			++maxlen;
+	}
+	max = max < maxlen ? max : maxlen;
 	size_t i;
 	for (i = 0; i < max; ++i) {
 		struct value element;

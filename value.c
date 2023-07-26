@@ -122,6 +122,47 @@ value_in_inferior(struct value *valp, arch_addr_t address)
 	valp->u.address = address;
 }
 
+static char preload_buf[1024 * 1024];
+static arch_addr_t preload_buf_start, preload_buf_end;
+int
+value_preload_for_array(struct value *val, size_t len)
+{
+	if (preload_buf_start || val->where != VAL_LOC_INFERIOR)
+		return 0;
+
+	struct arg_type_info *e_info = type_element(val->type, 0);
+	if (e_info == NULL)
+		return 0;
+	// We only have one preload: use it to map in arrays of primitives (strings. it's strings.)
+	switch(e_info->type) {
+		case ARGTYPE_VOID:
+		case ARGTYPE_ARRAY:
+		case ARGTYPE_STRUCT:
+			return 0;
+		default:
+			break;
+	}
+
+	size_t el_sz = type_sizeof(val->inferior, e_info);
+	if (el_sz == (size_t)-1)
+		return 0;
+
+	if (__builtin_mul_overflow(len, el_sz, &len) || len > sizeof(preload_buf))
+		len = sizeof(preload_buf);
+	size_t rd = umovebytes(val->inferior, val->u.inf_address, preload_buf, len);
+	if(rd == (size_t)-1)
+		return 0;
+	preload_buf_start = val->u.inf_address;
+	preload_buf_end = val->u.inf_address + rd;
+	return 1;
+}
+void
+value_preload_for_array_flush(int *preloaded)
+{
+	if (*preloaded && *preloaded != -1)
+		preload_buf_start = preload_buf_end = 0;
+}
+
 int
 value_reify(struct value *val, struct value_dict *arguments)
 {
@@ -145,12 +186,18 @@ value_reify(struct value *val, struct value_dict *arguments)
 		nloc = VAL_LOC_COPY;
 	}
 
+	if (val->u.inf_address >= preload_buf_start && val->u.inf_address + size <= preload_buf_end) {
+		memcpy(data, preload_buf + (val->u.inf_address - preload_buf_start), size);
+		goto ok;
+	}
+
 	if (umovebytes(val->inferior, val->u.inf_address, data, size) < size) {
 		if (nloc == VAL_LOC_COPY)
 			free(data);
 		return -1;
 	}
 
+ok:
 	val->where = nloc;
 	if (nloc == VAL_LOC_COPY)
 		val->u.address = data;
