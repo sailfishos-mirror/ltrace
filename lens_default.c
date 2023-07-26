@@ -240,7 +240,7 @@ static int
 format_struct(FILE *stream, struct value *value, struct value_dict *arguments)
 {
 	int written = 0;
-	if (acc_fprintf(&written, stream, "{ ") < 0)
+	if (acc_fprintf(&written, stream, "{") < 0)
 		return -1;
 
 	int need_delim = 0;
@@ -259,7 +259,7 @@ format_struct(FILE *stream, struct value *value, struct value_dict *arguments)
 
 		written += o;
 	}
-	if (acc_fprintf(&written, stream, " }") < 0)
+	if (acc_fprintf(&written, stream, "}") < 0)
 		return -1;
 	return written;
 }
@@ -438,7 +438,7 @@ toplevel_format_lens(struct lens *lens, FILE *stream,
 	case ARGTYPE_ARRAY:
 		return format_array(stream, value, arguments,
 				    value->type->u.array_info.length,
-				    options.arraylen, 1, "[ ", " ]", ", ");
+				    options.arraylen, 1, "[", "]", ", ");
 	}
 	abort();
 }
