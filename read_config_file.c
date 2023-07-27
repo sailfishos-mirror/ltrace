@@ -942,6 +942,7 @@ static struct named_lens {
 	struct lens *lens;
 } lenses[] = {
 	{ "hide", &blind_lens },
+	{ "bin", &binary_lens },
 	{ "octal", &octal_lens },
 	{ "oct", &octal_lens },
 	{ "bitvec", &bitvect_lens },

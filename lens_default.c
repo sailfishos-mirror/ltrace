@@ -60,6 +60,12 @@ READER(read_double, double)
 
 #undef READER
 
+#ifndef PRIb64  // Underlying format supported by bookworm glibc, but macros not exposed until 2.38
+#ifndef __PRI64_PREFIX
+#define __PRI64_PREFIX "ll"
+#endif
+#define PRIb64 __PRI64_PREFIX "b"
+#endif
 #define HANDLE_WIDTH(BITS)						\
 	do {								\
 		long long l;							\
@@ -79,6 +85,8 @@ READER(read_double, double)
 			return fprintf(stream, "%"PRIu64, v);		\
 		case INT_FMT_o:						\
 			return fprintf(stream, "0%"PRIo64, v);		\
+		case INT_FMT_b:						\
+			return fprintf(stream, "%#"PRIb64, v);		\
 		}							\
 	} while (0)
 
@@ -88,6 +96,7 @@ enum int_fmt_t
 	INT_FMT_u,
 	INT_FMT_o,
 	INT_FMT_x,
+	INT_FMT_b,
 	INT_FMT_unknown,
 	INT_FMT_default,
 };
@@ -473,6 +482,18 @@ blind_lens_format_cb(struct lens *lens, FILE *stream,
 
 struct lens blind_lens = {
 	.format_cb = blind_lens_format_cb,
+};
+
+
+static int
+binary_lens_format_cb(struct lens *lens, FILE *stream,
+		     struct value *value, struct value_dict *arguments)
+{
+	return toplevel_format_lens(lens, stream, value, arguments, INT_FMT_b);
+}
+
+struct lens binary_lens = {
+	.format_cb = binary_lens_format_cb,
 };
 
 

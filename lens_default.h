@@ -29,6 +29,9 @@ extern struct lens default_lens;
 /* A lens that doesn't output anything.  */
 extern struct lens blind_lens;
 
+/* A lens that formats integers in binary.  */
+extern struct lens binary_lens;
+
 /* A lens that formats integers in octal.  */
 extern struct lens octal_lens;
 
