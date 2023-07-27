@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "printf.h"
 #include "type.h"
@@ -213,6 +214,7 @@ param_printf_next(struct param_enum *self, struct arg_type_info *infop,
 	char len_buf[25] = {};
 	size_t len_buf_len = 0;
 	struct lens *lens = NULL;
+	bool digital_width = false, digital_width_fast = false;
 
 	for (; self->ptr < self->end; self->ptr += self->width) {
 		union {
@@ -263,11 +265,49 @@ param_printf_next(struct param_enum *self, struct arg_type_info *infop,
 		case '1': case '2': case '3':
 		case '4': case '5': case '6':
 		case '7': case '8': case '9':
-			/* Field length likewise, but we need to parse
-			 * this to attach the appropriate string
-			 * length expression.  */
-			if (len_buf_len < sizeof(len_buf) - 1)
-				len_buf[len_buf_len++] = c;
+			if(!digital_width) {
+				/* Field length likewise, but we need to parse
+				 * this to attach the appropriate string
+				 * length expression.  */
+				if (len_buf_len < sizeof(len_buf) - 1)
+					len_buf[len_buf_len++] = c;
+			} else {
+				/* %w32d */
+				digital_width = false;
+				int b;
+				switch(strtoul(self->ptr, (char **)&self->ptr, 10)) {
+#define W_OR_WF(bits)                                               \
+	case bits:                                                  \
+		--self->ptr;                                        \
+		b = digital_width_fast ? sizeof(int_fast##bits##_t) \
+				       : sizeof(int##bits##_t);     \
+		break
+				W_OR_WF(8);
+				W_OR_WF(16);
+				W_OR_WF(32);
+				W_OR_WF(64);
+				default:
+					goto err;
+				}
+				switch(b) {
+					case 1:
+						hlf = 2;
+						lng = 0;
+						break;
+					case 2:
+						hlf = 1;
+						lng = 0;
+						break;
+					case 4:
+						hlf = 0;
+						lng = 0;
+						break;
+					case 8:
+						hlf = 0;
+						lng = 2;
+						break;
+				}
+			}
 			continue;
 
 		case 'h':
@@ -296,6 +336,16 @@ param_printf_next(struct param_enum *self, struct arg_type_info *infop,
 		case 't': /* ptrdiff_t */
 		case 'Z': case 'z': /* size_t */
 			lng = 1; /* XXX ABI should tell */
+			continue;
+
+		case 'w':
+			++self->ptr;
+			digital_width = 1;
+			if(self->ptr >= self->end || *self->ptr != 'f') {
+				--self->ptr;
+				digital_width_fast = false;
+			} else
+				digital_width_fast = true;
 			continue;
 
 		case 'd':
@@ -379,6 +429,7 @@ param_printf_next(struct param_enum *self, struct arg_type_info *infop,
 		return 0;
 	}
 
+err:
 	*infop = *type_get_simple(ARGTYPE_VOID);
 	return 0;
 }
