@@ -117,11 +117,11 @@ prototype_each_param(struct prototype *proto, struct param *start_after,
 
 void
 named_type_init(struct named_type *named,
-		struct arg_type_info *info, int own_type)
+		struct arg_type_info *info, bool own_type)
 {
 	named->info = info;
 	named->own_type = own_type;
-	named->forward = 0;
+	named->forward = false;
 }
 
 void

@@ -26,6 +26,7 @@
 #define OPTIONS_H
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <sys/types.h>
 #include <sys/time.h>
 
@@ -59,7 +60,7 @@ struct options_t {
 };
 extern struct options_t options;
 
-extern int opt_i;		/* instruction pointer */
+extern bool opt_i;		/* instruction pointer */
 extern int opt_r;		/* print relative timestamp */
 extern int opt_t;		/* print absolute timestamp */
 extern int opt_T;		/* show the time spent inside each call */

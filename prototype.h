@@ -33,7 +33,7 @@ struct prototype {
 	struct vect params;
 
 	struct arg_type_info *return_info;
-	int own_return_info : 1;
+	bool own_return_info : 1;
 };
 
 /* Initialize a prototype PROTO.  The name will be NAME, and the
@@ -70,14 +70,14 @@ struct param *prototype_each_param
 /* For storing type aliases.  */
 struct named_type {
 	struct arg_type_info *info;
-	int forward : 1;
-	int own_type : 1;
+	bool forward : 1;
+	bool own_type : 1;
 };
 
 /* Initialize a named type INFO, which, if OWN_TYPE, is destroyed when
  * named_type_destroy is called.  */
 void named_type_init(struct named_type *named,
-		     struct arg_type_info *info, int own_type);
+		     struct arg_type_info *info, bool own_type);
 
 void named_type_destroy(struct named_type *named);
 
@@ -162,7 +162,7 @@ struct protolib_cache {
 
 	/* For tracking uses of cache during cache's own
 	 * initialization.  */
-	int bootstrap : 1;
+	bool bootstrap : 1;
 };
 
 /* Initialize CACHE.  Returns 0 on success or a negative value on

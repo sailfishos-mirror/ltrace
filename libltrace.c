@@ -46,7 +46,7 @@ int exiting = 0;		/* =1 if a SIGINT or SIGTERM has been received */
 static enum callback_status
 stop_non_p_processes(struct process *proc, void *data)
 {
-	int stop = 1;
+	bool stop = true;
 
 	for (size_t i = 0; i < opt_p_len; ++i) {
 		struct process *p_proc = pid2proc(opt_p[i]);
@@ -55,7 +55,7 @@ stop_non_p_processes(struct process *proc, void *data)
 			continue;
 		}
 		if (p_proc == proc || p_proc->leader == proc->leader) {
-			stop = 0;
+			stop = false;
 			break;
 		}
 	}

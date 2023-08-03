@@ -59,8 +59,8 @@ struct options_t options = {
 	.follow = 0,                  /* trace child processes */
 };
 
-static char *progname;		/* Program name (`ltrace') */
-int opt_i = 0;			/* instruction pointer */
+static const char *progname;		/* Program name (`ltrace') */
+bool opt_i = false;			/* instruction pointer */
 int opt_r = 0;			/* print relative timestamp */
 int opt_t = 0;			/* print absolute timestamp */
 int opt_T = 0;			/* show the time spent inside each call */
@@ -530,7 +530,7 @@ process_options(int argc, char **argv)
 
 	guess_cols();
 
-	int libcalls = 1;
+	bool libcalls = true;
 
 	while (1) {
 		int c;
@@ -619,7 +619,7 @@ process_options(int argc, char **argv)
 			usage();
 			exit(0);
 		case 'i':
-			opt_i++;
+			opt_i = true;
 			break;
 
 		case 'l': {
@@ -632,7 +632,7 @@ process_options(int argc, char **argv)
 		}
 
 		case 'L':
-			libcalls = 0;
+			libcalls = false;
 			break;
 		case 'n':
 			options.indent = parse_int(optarg, 'n', 0, 20);

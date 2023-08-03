@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "ltrace.h"
 #include "defs.h"
