@@ -307,11 +307,8 @@ static struct arg_type_info *get_enum(Dwarf_Die *parent,
 			value_destroy(value);				\
 			free(value);					\
 		}							\
-		if (lens != NULL) {					\
-			lens_destroy(&lens->super);			\
-			free(lens);					\
-		}							\
 		if (result != NULL) {					\
+			/* This also frees lens.  */			\
 			type_destroy(result);				\
 			free(result);					\
 		}							\
