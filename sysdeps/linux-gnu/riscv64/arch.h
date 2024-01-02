@@ -25,9 +25,19 @@
 
 #define ARCH_ENDIAN_LITTLE
 
+/* NOTE:
+    Name 'BREAKPOINT_LENGTH' is expected to exist and be constexpr
+    (e.g. to initialize unsigned char orig_value[BREAKPOINT_LENGTH]),
+    so it's kind of public, of semantic "max possible size of breakpoint".
+*/
 /* ebreak */
 #define BREAKPOINT_VALUE { 0x73, 0x00, 0x10, 0x00 }
 #define BREAKPOINT_LENGTH 4
+
+/* c.ebreak */
+#define BREAKPOINT_VALUE_COMPRESSED { 0x02, 0x90 }
+#define BREAKPOINT_LENGTH_COMPRESSED 2
+
 #define DECR_PC_AFTER_BREAK 0
 
 #define LT_ELFCLASS    ELFCLASS64
@@ -39,6 +49,9 @@
 
 #define ARCH_HAVE_FETCH_ARG
 #define ARCH_HAVE_FETCH_PACK
+
+#define ARCH_HAVE_ENABLE_BREAKPOINT
+#define ARCH_HAVE_DISABLE_BREAKPOINT
 
 #define ARCH_HAVE_LTELF_DATA
 struct arch_ltelf_data {
