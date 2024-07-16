@@ -29,6 +29,7 @@ to test each release comprehensively on each target.
 	armv7l-*-linux-gnueabihf
 	i[4567]86-*-linux-gnu
 	ia64-*-linux-gnu
+	loongarch-*-linux-gnu
 	m68k-*-linux-gnu
 	metag-*-linux-uclibc
 	mips-*-linux-gnu

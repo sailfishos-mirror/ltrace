@@ -56,7 +56,7 @@
 	"unlinkat",                        /* 35 */
 	"symlinkat",                       /* 36 */
 	"linkat",                          /* 37 */
-	"renameat",                        /* 38 */
+	"38",                              /* 38 */
 	"umount2",                         /* 39 */
 	"mount",                           /* 40 */
 	"pivot_root",                      /* 41 */
@@ -181,8 +181,8 @@
 	"uname",                           /* 160 */
 	"sethostname",                     /* 161 */
 	"setdomainname",                   /* 162 */
-	"getrlimit",                       /* 163 */
-	"setrlimit",                       /* 164 */
+	"163",                             /* 163 */
+	"164",                             /* 164 */
 	"getrusage",                       /* 165 */
 	"umask",                           /* 166 */
 	"prctl",                           /* 167 */
@@ -262,7 +262,7 @@
 	"perf_event_open",                 /* 241 */
 	"accept4",                         /* 242 */
 	"recvmmsg",                        /* 243 */
-	"arch_specific_syscall",           /* 244 */
+	"244",                             /* 244 */
 	"245",                             /* 245 */
 	"246",                             /* 246 */
 	"247",                             /* 247 */
@@ -465,7 +465,19 @@
 	"landlock_create_ruleset",         /* 444 */
 	"landlock_add_rule",               /* 445 */
 	"landlock_restrict_self",          /* 446 */
-	"memfd_secret",                    /* 447 */
+	"447",                             /* 447 */
 	"process_mrelease",                /* 448 */
 	"futex_waitv",                     /* 449 */
 	"set_mempolicy_home_node",         /* 450 */
+	"cachestat",                       /* 451 */
+	"fchmodat2",                       /* 452 */
+	"map_shadow_stack",                /* 453 */
+	"futex_wake",                      /* 454 */
+	"futex_wait",                      /* 455 */
+	"futex_requeue",                   /* 456 */
+	"statmount",                       /* 457 */
+	"listmount",                       /* 458 */
+	"lsm_get_self_attr",               /* 459 */
+	"lsm_set_self_attr",               /* 460 */
+	"lsm_list_modules",                /* 461 */
+	"mseal",                           /* 462 */
