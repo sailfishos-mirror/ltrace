@@ -18,6 +18,7 @@
  * 02110-1301 USA
  */
 
+#include <stdio.h>
 #include <sys/uio.h>
 #include <gelf.h>
 #include "ltrace-elf.h"

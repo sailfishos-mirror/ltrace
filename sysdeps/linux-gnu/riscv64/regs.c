@@ -18,6 +18,8 @@
  * 02110-1301 USA
  */
 
+#include <errno.h>
+#include <stdio.h>
 #include <sys/uio.h>
 #include "proc.h"
 #include "ptrace.h"
