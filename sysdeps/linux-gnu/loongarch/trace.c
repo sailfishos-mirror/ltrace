@@ -18,6 +18,7 @@
  * 02110-1301 USA
  */
 
+#include <stdio.h>
 #include <sys/ptrace.h>
 #include <sys/types.h>
 #include <sys/wait.h>

@@ -18,6 +18,7 @@
  * 02110-1301 USA
  */
 
+#include <elf.h>
 #include <sys/ptrace.h>
 #include <asm/ptrace.h>
 #include <stdlib.h>

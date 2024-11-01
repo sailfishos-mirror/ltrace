@@ -18,6 +18,7 @@
  * 02110-1301 USA
  */
 
+#include <stdio.h>
 #include <gelf.h>
 #include <stdbool.h>
 #include "backend.h"
