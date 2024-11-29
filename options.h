@@ -64,12 +64,8 @@ extern int opt_r;		/* print relative timestamp */
 extern int opt_t;		/* print absolute timestamp */
 extern int opt_T;		/* show the time spent inside each call */
 
-struct opt_p_t {
-	pid_t pid;
-	struct opt_p_t *next;
-};
-
-extern struct opt_p_t *opt_p;	/* attach to process with a given pid */
+extern pid_t *opt_p;	/* attach to process with a given pid */
+extern size_t opt_p_len;
 
 enum opt_F_kind {
 	OPT_F_UNKNOWN = 0,

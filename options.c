@@ -66,7 +66,8 @@ int opt_t = 0;			/* print absolute timestamp */
 int opt_T = 0;			/* show the time spent inside each call */
 
 /* List of pids given to option -p: */
-struct opt_p_t *opt_p = NULL;	/* attach to process with a given pid */
+pid_t *opt_p = NULL;	/* attach to process with a given pid */
+size_t opt_p_len = 0;
 
 /* Vector of struct opt_F_t.  */
 struct vect opt_F;
@@ -118,7 +119,7 @@ usage(void) {
 static void
 usage_debug(void) {
 	fprintf(stdout, "%s debugging option, --debug=<octal> or -D<octal>:\n", progname);
-	fprintf(stdout, 
+	fprintf(stdout,
 			"\n"
 			" number  ref. in source   description\n"
 			"      1   general           Generally helpful progress information\n"
@@ -648,17 +649,12 @@ process_options(int argc, char **argv)
 			fcntl(fileno(options.output), F_SETFD, FD_CLOEXEC);
 			break;
 		case 'p':
-			{
-				struct opt_p_t *tmp = malloc(sizeof(struct opt_p_t));
-				if (!tmp) {
-					perror("ltrace: malloc");
-					exit(1);
-				}
-				tmp->pid = parse_int(optarg, 'p', 1, 0);
-				tmp->next = opt_p;
-				opt_p = tmp;
-				break;
+			if (!(opt_p = reallocarray(opt_p, ++opt_p_len, sizeof(*opt_p)))) {
+				perror("ltrace: malloc");
+				exit(1);
 			}
+			opt_p[opt_p_len - 1] = parse_int(optarg, 'p', 1, 0);
+			break;
 		case 'r':
 			opt_r++;
 			break;

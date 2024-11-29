@@ -48,11 +48,10 @@ stop_non_p_processes(struct process *proc, void *data)
 {
 	int stop = 1;
 
-	struct opt_p_t *it;
-	for (it = opt_p; it != NULL; it = it->next) {
-		struct process *p_proc = pid2proc(it->pid);
+	for (size_t i = 0; i < opt_p_len; ++i) {
+		struct process *p_proc = pid2proc(opt_p[i]);
 		if (p_proc == NULL) {
-			printf("stop_non_p_processes: %d terminated?\n", it->pid);
+			printf("stop_non_p_processes: %d terminated?\n", opt_p[i]);
 			continue;
 		}
 		if (p_proc == proc || p_proc->leader == proc->leader) {
@@ -105,8 +104,6 @@ ltrace_init(int argc, char **argv)
 {
 	setlocale(LC_ALL, "");
 
-	struct opt_p_t *opt_p_tmp;
-
 	atexit(normal_exit);
 	signal(SIGINT, signal_exit);	/* Detach processes when interrupted */
 	signal(SIGTERM, signal_exit);	/*  ... or killed */
@@ -136,11 +133,8 @@ ltrace_init(int argc, char **argv)
 		trace_set_options(proc);
 		continue_process(pid);
 	}
-	opt_p_tmp = opt_p;
-	while (opt_p_tmp) {
-		open_pid(opt_p_tmp->pid);
-		opt_p_tmp = opt_p_tmp->next;
-	}
+	for (size_t i = 0; i < opt_p_len; ++i)
+		open_pid(opt_p[i]);
 }
 
 static int num_ltrace_callbacks[EVENT_MAX];
@@ -148,7 +142,7 @@ static callback_func * ltrace_callbacks[EVENT_MAX];
 
 void
 ltrace_add_callback(callback_func func, Event_type type) {
-	ltrace_callbacks[type] = realloc(ltrace_callbacks[type], (num_ltrace_callbacks[type]+1)*sizeof(callback_func));
+	ltrace_callbacks[type] = reallocarray(ltrace_callbacks[type], num_ltrace_callbacks[type] + 1, sizeof(callback_func));
 	ltrace_callbacks[type][num_ltrace_callbacks[type]++] = func;
 }
 
@@ -156,7 +150,7 @@ static void
 dispatch_callbacks(Event * ev) {
 	int i;
 	/* Ignoring case 1: signal into a dying tracer */
-	if (ev->type==EVENT_SIGNAL && 
+	if (ev->type==EVENT_SIGNAL &&
 			exiting && ev->e_un.signum == SIGSTOP) {
 		return;
 	}

@@ -423,9 +423,8 @@ detach_process(struct process *leader)
 	proc_each_breakpoint(leader, NULL, retract_breakpoint_cb, NULL);
 
 	/* Now untrace the process, if it was attached to by -p.  */
-	struct opt_p_t *it;
-	for (it = opt_p; it != NULL; it = it->next) {
-		struct process *proc = pid2proc(it->pid);
+	for (size_t i = 0; i < opt_p_len; ++i) {
+		struct process *proc = pid2proc(opt_p[i]);
 		if (proc == NULL)
 			continue;
 		if (proc->leader == leader) {
@@ -1172,9 +1171,8 @@ continue_after_exec(struct process *proc)
 void
 os_ltrace_exiting(void)
 {
-	struct opt_p_t *it;
-	for (it = opt_p; it != NULL; it = it->next) {
-		struct process *proc = pid2proc(it->pid);
+	for (size_t i = 0; i < opt_p_len; ++i) {
+		struct process *proc = pid2proc(opt_p[i]);
 		if (proc == NULL || proc->leader == NULL)
 			continue;
 		if (ltrace_exiting_install_handler(proc->leader) < 0)
