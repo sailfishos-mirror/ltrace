@@ -83,8 +83,6 @@ static int parse_enum(struct protolib *plib, struct locus *loc,
 
 static int try_parse_kwd(char **str, const char *kwd);
 
-struct prototype *list_of_functions = NULL;
-
 static int
 parse_arg_type(char **name, enum arg_type *ret)
 {
