@@ -38,7 +38,8 @@
 struct param_enum {
 	struct value array;
 	int percent;
-	unsigned long long *future_length;
+	bool have_future_precision;
+	unsigned long long future_precision;
 	char *format;
 	char const *ptr;
 	char const *end;
@@ -107,23 +108,14 @@ param_printf_init(struct value *cb_args, size_t nargs,
 	self->percent = 0;
 	self->ptr = self->format;
 	self->end = self->format + size;
-	self->future_length = NULL;
+	self->have_future_precision = false;
 	return self;
-}
-
-static void
-drop_future_length(struct param_enum *self)
-{
-	if (self->future_length != NULL) {
-		free(self->future_length);
-		self->future_length = NULL;
-	}
 }
 
 static int
 form_next_param(struct param_enum *self,
 		enum arg_type format_type, enum arg_type elt_type,
-		unsigned hlf, unsigned lng, char *len_buf, size_t len_buf_len,
+		unsigned hlf, unsigned lng, char *prec_buf, size_t prec_buf_len,
 		struct arg_type_info *infop)
 {
 	/* XXX note: Some types are wrong because we lack
@@ -153,8 +145,8 @@ form_next_param(struct param_enum *self,
 
 		struct expr_node *node = NULL;
 		int own_node;
-		if (len_buf_len != 0
-		    || self->future_length != NULL) {
+		if (prec_buf_len != 0
+		    || self->have_future_precision) {
 			struct tmp {
 				struct expr_node node;
 				struct arg_type_info type;
@@ -170,11 +162,11 @@ form_next_param(struct param_enum *self,
 			len->type = *type_get_simple(ARGTYPE_LONG);
 
 			long l;
-			if (self->future_length != NULL) {
-				l = *self->future_length;
-				drop_future_length(self);
+			if (self->have_future_precision) {
+				l = self->future_precision;
+				self->have_future_precision = false;
 			} else {
-				l = atol(len_buf);
+				l = atol(prec_buf);
 			}
 
 			expr_init_const_word(&len->node, l, &len->type, 0);
@@ -211,10 +203,10 @@ param_printf_next(struct param_enum *self, struct arg_type_info *infop,
 	unsigned lng = 0;
 	enum arg_type format_type = ARGTYPE_VOID;
 	enum arg_type elt_type = ARGTYPE_VOID;
-	char len_buf[25] = {};
-	size_t len_buf_len = 0;
+	char prec_buf[25] = {};
+	size_t prec_buf_len = 0;
 	struct lens *lens = NULL;
-	bool digital_width = false, digital_width_fast = false;
+	bool digital_width = false, digital_width_fast = false, in_precision = false;
 
 	for (; self->ptr < self->end; self->ptr += self->width) {
 		union {
@@ -245,21 +237,20 @@ param_printf_next(struct param_enum *self, struct arg_type_info *infop,
 			 * not for interpreting the type.  */
 			continue;
 
+		case '.':
+			/* Digits and * we see now apply to precision, not width.
+			 * This mostly matters for %s. */
+			in_precision = true;
+			continue;
+
 		case '*':
 			/* Length parameter given in the next
 			 * argument.  */
-			if (self->future_length == NULL)
-				/* This should really be an assert,
-				 * but we can't just fail on invalid
-				 * format string.  */
-				self->future_length
-					= malloc(sizeof(*self->future_length));
-
-			if (self->future_length != NULL) {
-				self->ptr += self->width;
-				format_type = ARGTYPE_INT;
-				break;
-			}
+			if (in_precision)
+				self->have_future_precision = true;
+			self->ptr += self->width;
+			format_type = ARGTYPE_INT;
+			break;
 
 		case '0':
 		case '1': case '2': case '3':
@@ -268,9 +259,10 @@ param_printf_next(struct param_enum *self, struct arg_type_info *infop,
 			if(!digital_width) {
 				/* Field length likewise, but we need to parse
 				 * this to attach the appropriate string
-				 * length expression.  */
-				if (len_buf_len < sizeof(len_buf) - 1)
-					len_buf[len_buf_len++] = c;
+				 * length expression.
+				 * We don't care about width. */
+				if (in_precision && prec_buf_len < sizeof(prec_buf) - 1)
+					prec_buf[prec_buf_len++] = c;
 			} else {
 				/* %w32d */
 				digital_width = false;
@@ -420,7 +412,7 @@ param_printf_next(struct param_enum *self, struct arg_type_info *infop,
 		assert(format_type != ARGTYPE_VOID);
 
 		if (form_next_param(self, format_type, elt_type, hlf, lng,
-				    len_buf, len_buf_len, infop) < 0)
+				    prec_buf, prec_buf_len, infop) < 0)
 			return -1;
 
 		infop->lens = lens;
@@ -437,9 +429,9 @@ err:
 static enum param_status
 param_printf_stop(struct param_enum *self, struct value *value)
 {
-	if (self->future_length != NULL
-	    && value_extract_word(value, (long long *)self->future_length, NULL) < 0)
-		drop_future_length(self);
+	if (self->have_future_precision
+	    && value_extract_word(value, (long long *)&self->future_precision, NULL) < 0)
+		self->have_future_precision = false;
 
 	return PPCB_CONT;
 }
