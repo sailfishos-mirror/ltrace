@@ -116,7 +116,7 @@ ltrace_init(int argc, char **argv)
 		 * calling execute_program.  */
 		{
 			struct ltelf lte;
-			if (ltelf_init(&lte, command) == 0)
+			if (ltelf_init(&lte, command, true) == 0)
 				ltelf_destroy(&lte);
 			else
 				exit(EXIT_FAILURE);

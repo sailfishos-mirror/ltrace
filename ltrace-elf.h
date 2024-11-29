@@ -27,6 +27,7 @@
 #include <gelf.h>
 #include <stdlib.h>
 #include <callback.h>
+#include <stdbool.h>
 
 #include "forward.h"
 #include "sysdep.h"
@@ -69,7 +70,7 @@ struct ltelf {
 	struct arch_ltelf_data arch;
 };
 
-int ltelf_init(struct ltelf *lte, const char *filename);
+int ltelf_init(struct ltelf *lte, const char *filename, bool chase_shebang);
 void ltelf_destroy(struct ltelf *lte);
 
 /* XXX is it possible to put breakpoints in VDSO and VSYSCALL

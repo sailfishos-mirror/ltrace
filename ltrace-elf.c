@@ -357,7 +357,7 @@ elf_read_uleb128(Elf_Data *data, GElf_Xword offset, uint64_t *retp)
 }
 
 int
-ltelf_init(struct ltelf *lte, const char *filename)
+ltelf_init(struct ltelf *lte, const char *filename, bool chase_shebang)
 {
 	memset(lte, 0, sizeof *lte);
 	lte->fd = open(filename, O_RDONLY);
@@ -376,6 +376,22 @@ ltelf_init(struct ltelf *lte, const char *filename)
 #endif
 
 	if (lte->elf == NULL || elf_kind(lte->elf) != ELF_K_ELF) {
+		if (chase_shebang) {
+			char buf[256], *exec, *eol; // Matches Linux BINPRM_BUF_SIZE
+			ssize_t rd = pread(lte->fd, buf, sizeof(buf), 0);
+			close(lte->fd);
+
+			// Need full line with #!
+			if (rd > 3 && buf[0] == '#' && buf[1] == '!' && (eol = memchr(buf, '\n', rd))) {
+				*eol = '\0';
+
+				exec = buf + 2;
+				exec += strspn(exec, " \t");
+				exec[strcspn(exec, " \t")] = '\0';
+				return ltelf_init(lte, exec, chase_shebang);
+			}
+		}
+
 		fprintf(stderr, "\"%s\" is not an ELF file\n", filename);
 		exit(EXIT_FAILURE);
 	}
@@ -1152,7 +1168,7 @@ read_module(struct library *lib, struct process *proc,
 	    const char *filename, GElf_Addr bias, int main)
 {
 	struct ltelf lte;
-	if (ltelf_init(&lte, filename) < 0)
+	if (ltelf_init(&lte, filename, false) < 0)
 		return -1;
 
 	/* XXX When we abstract ABI into a module, this should instead
