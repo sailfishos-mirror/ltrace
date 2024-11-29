@@ -537,7 +537,7 @@ process_options(int argc, char **argv)
 		char *p;
 #ifdef HAVE_GETOPT_LONG
 		int option_index = 0;
-		static struct option long_options[] = {
+		static const struct option long_options[] = {
 			{"align", 1, 0, 'a'},
 			{"config", 1, 0, 'F'},
 			{"debug", 1, 0, 'D'},
@@ -638,15 +638,14 @@ process_options(int argc, char **argv)
 			options.indent = parse_int(optarg, 'n', 0, 20);
 			break;
 		case 'o':
-			options.output = fopen(optarg, "w");
+			options.output = fopen(optarg, "we");
 			if (!options.output) {
 				fprintf(stderr,
 					"can't open %s for writing: %s\n",
 					optarg, strerror(errno));
 				exit(1);
 			}
-			setvbuf(options.output, (char *)NULL, _IOLBF, 0);
-			fcntl(fileno(options.output), F_SETFD, FD_CLOEXEC);
+			setvbuf(options.output, NULL, _IOLBF, 0);
 			break;
 		case 'p':
 			if (!(opt_p = reallocarray(opt_p, ++opt_p_len, sizeof(*opt_p)))) {
