@@ -357,9 +357,14 @@ elf_read_uleb128(Elf_Data *data, GElf_Xword offset, uint64_t *retp)
 }
 
 int
-ltelf_init(struct ltelf *lte, const char *filename, bool chase_shebang)
+ltelf_init(struct ltelf *lte, const char *filename, bool chase_shebang, pid_t pid)
 {
 	memset(lte, 0, sizeof *lte);
+	if (pid != -1 && !strncmp(filename, "/proc/self", strlen("/proc/self"))) {
+		char *new = alloca(strlen(filename) - strlen("self") + sizeof("18446744073709551616"));
+		sprintf(new, "/proc/%lld%s", (long long)pid, filename + strlen("/proc/self"));
+		filename = new;
+	}
 	lte->fd = open(filename, O_RDONLY);
 	if (lte->fd == -1) {
 		fprintf(stderr, "Can't open %s: %s\n", filename,
@@ -388,7 +393,7 @@ ltelf_init(struct ltelf *lte, const char *filename, bool chase_shebang)
 				exec = buf + 2;
 				exec += strspn(exec, " \t");
 				exec[strcspn(exec, " \t")] = '\0';
-				return ltelf_init(lte, exec, chase_shebang);
+				return ltelf_init(lte, exec, chase_shebang, pid);
 			}
 		}
 
@@ -1168,7 +1173,7 @@ read_module(struct library *lib, struct process *proc,
 	    const char *filename, GElf_Addr bias, int main)
 {
 	struct ltelf lte;
-	if (ltelf_init(&lte, filename, false) < 0)
+	if (ltelf_init(&lte, filename, false, proc->pid) < 0)
 		return -1;
 
 	/* XXX When we abstract ABI into a module, this should instead
