@@ -360,6 +360,7 @@ int
 ltelf_init(struct ltelf *lte, const char *filename, bool chase_shebang, pid_t pid)
 {
 	memset(lte, 0, sizeof *lte);
+	VECT_INIT(&lte->plt_relocs, GElf_Rela);
 	if (pid != -1 && !strncmp(filename, "/proc/self", strlen("/proc/self"))) {
 		char *new = alloca(strlen(filename) - strlen("self") + sizeof("18446744073709551616"));
 		sprintf(new, "/proc/%lld%s", (long long)pid, filename + strlen("/proc/self"));
@@ -432,8 +433,6 @@ ltelf_init(struct ltelf *lte, const char *filename, bool chase_shebang, pid_t pi
 			filename);
 		exit(EXIT_FAILURE);
 	}
-
-	VECT_INIT(&lte->plt_relocs, GElf_Rela);
 
 	return 0;
 }
