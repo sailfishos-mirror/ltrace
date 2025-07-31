@@ -18,6 +18,7 @@
  * 02110-1301 USA
  */
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -30,9 +31,9 @@
 
 struct enum_entry {
 	char *key;
-	int own_key;
 	struct value *value;
-	int own_value;
+	bool own_key : 1;
+	bool own_value : 1;
 };
 
 static void
@@ -148,7 +149,7 @@ lens_enum_add(struct enum_lens *lens,
 	      const char *key, int own_key,
 	      struct value *value, int own_value)
 {
-	struct enum_entry entry = { (char *)key, own_key, value, own_value };
+	struct enum_entry entry = { (char *)key, value, own_key, own_value };
 	return VECT_PUSHBACK(&lens->entries, &entry);
 }
 
