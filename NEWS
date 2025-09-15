@@ -32,6 +32,7 @@
      complements the data available in config files
 
 ** Architectural support
+   - RISC-V initial support included.
    - MIPS and MIPSel are now handled by the same backend.
    - ARMv6, ARMv7 and ARMv8 (AArch64) are supported, including full
      fetch backend.  ARMv8 backend doesn't support tracing of 32-bit
