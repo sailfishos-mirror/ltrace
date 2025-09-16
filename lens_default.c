@@ -32,6 +32,7 @@
 #include <string.h>
 #include <wchar.h>
 
+#include "config.h"
 #include "bits.h"
 #include "expr.h"
 #include "lens_default.h"

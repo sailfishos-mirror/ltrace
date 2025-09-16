@@ -29,6 +29,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "config.h"
 #include "backend.h"
 #include "dict.h"
 #include "options.h"

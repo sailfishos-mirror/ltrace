@@ -24,6 +24,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "config.h"
 #include "common.h"
 #include "callback.h"
 #include "param.h"
