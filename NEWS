@@ -1,4 +1,9 @@
 -*-org-*-
+* Version 0.8.1
+
+** Bugfixes
+  - include config.h in more cases to fix LTO builds
+
 * Version 0.8.0
 ** Prototype libraries
    - Each DSO can now ship an ltrace config file (called prototype
