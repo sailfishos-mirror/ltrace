@@ -520,12 +520,11 @@ arch_elf_init(struct ltelf *lte, struct library *lib)
 		GElf_Addr glink_vma;
 		if (elf_load_dynamic_entry(lte, DT_PPC64_GLINK,
 					   &glink_vma) < 0) {
-			fprintf(stderr, "couldn't find DT_PPC64_GLINK\n");
-			return -1;
+			lte->arch.plt_stub_vma = 0;
+		} else {
+			/* The first glink stub starts at offset 32.  */
+			lte->arch.plt_stub_vma = glink_vma + 32;
 		}
-
-		/* The first glink stub starts at offset 32.  */
-		lte->arch.plt_stub_vma = glink_vma + 32;
 
 	} else {
 		/* By exhaustion--PPC32 BSS.  */
